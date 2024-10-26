@@ -1,0 +1,56 @@
+
+<button id="saveBtn">Save File</button>
+<form method="post" action="">
+    {% csrf_token %}
+    <textarea name="code" rows="200" cols="80">{{code}}</textarea>
+    <br>
+    <input type="submit" value="Execute">
+</form>
+{% if output %}
+    <h2>Result:</h2>
+    <p>{{ output }}</p>
+{% endif %}
+
+<script>
+    var sendBtn = document.getElementById('saveBtn')
+    document.addEventListener('DOMContentLoaded', function() {
+        sendBtn.addEventListener('click', function(e) {
+            var code = document.getElementsByName('code')[0].textContent;
+    
+            if (code) {
+                var info = {
+                    'code': code
+                };
+    
+                fetch('/save_file/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(info)
+                })
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        });
+    });
+    
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    </script>
